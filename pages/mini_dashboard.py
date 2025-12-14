@@ -1,39 +1,28 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
+imimport streamlit as st
+from app.data.db import connect_database
+from app.data.incidents import get_all_incidents
 
-st.set_page_config(page_title="Mini Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Dashboard", layout="wide")
 
-st.title("📊 Mini Sales Dashboard")
+# ---------- AUTH GUARD ----------
+if "logged_in" not in st.session_state or not st.session_state.logged_in:
+    st.error("You must log in first.")
+    st.stop()
 
-# ---------- Sidebar filters ----------
-with st.sidebar:
-    st.header("Filters")
-    year = st.selectbox("Year", [2023, 2024, 2025], index=1)
-    min_revenue = st.slider("Min revenue", 0, 100_000, 20_000, step=5_000)
+st.title("📊 Cyber Incidents Dashboard")
+st.write(f"Welcome, **{st.session_state.username}**")
 
-# ---------- Fake data ----------
-np.random.seed(42)
-df = pd.DataFrame({
-    "year": np.random.choice([2023, 2024, 2025], size=200),
-    "region": np.random.choice(["Europe", "Asia", "Americas"], size=200),
-    "revenue": np.random.randint(5_000, 100_000, size=200),
-})
+# ---------- LOAD DATA ----------
+conn = connect_database()
+df = get_all_incidents(conn)
+conn.close()
 
-# Apply filters
-filtered = df[(df["year"] == year) & (df["revenue"] >= min_revenue)]
-st.caption(f"Showing {len(filtered)} rows for year {year} with revenue ≥ {min_revenue}")
+if df.empty:
+    st.info("No incidents found.")
+else:
+    st.dataframe(df, use_container_width=True)
 
-# ---------- Layout ----------
-col1, col2 = st.columns(2)
-with col1:
-    st.subheader("Revenue by Region")
-    rev_by_region = filtered.groupby("region")["revenue"].sum()
-    st.bar_chart(rev_by_region)
-
-with col2:
-    st.subheader("Revenue distribution")
-    st.area_chart(filtered["revenue"])
-
-with st.expander("See filtered data"):
-    st.dataframe(filtered)
+# ---------- LOGOUT ----------
+if st.button("Logout"):
+    st.session_state.clear()
+    st.switch_page("pages/home2.py")

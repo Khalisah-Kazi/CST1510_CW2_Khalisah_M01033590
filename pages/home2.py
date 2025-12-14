@@ -1,60 +1,46 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
+from app.services.user_services import register_user, login_user
 
-st.set_page_config(page_title="Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Login", layout="centered")
 
-# Ensure session state keys exist
-st.session_state.setdefault("logged_in", False)
-st.session_state.setdefault("username", "")
+st.title("🔐 Intelligence Platform")
 
-# Guard: if not logged in, prompt and stop
-if not st.session_state["logged_in"]:
-    st.error("You must be logged in to view the dashboard.")
-    if st.button("Go to login page"):
-        try:
-            st.switch_page("Home")
-        except Exception:
-            st.experimental_rerun()
-    st.stop()
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-# If logged in, show dashboard content
-st.title("Dashboard")
-st.success(f"Hello, {st.session_state['username']}! You are logged in.")
-st.caption("📊")
+if st.session_state.logged_in:
+    st.success("Already logged in!")
+    st.switch_page("pages/mini_dashboard.py")
 
-# Example dashboard layout
-st.caption("This is demo content — replace with your own dashboard.")
+tab1, tab2 = st.tabs(["Login", "Register"])
 
-# Sidebar filters
-with st.sidebar:
-    st.header("Filters")
-    n_points = st.slider("Number of data points", 10, 200, 50)
+# ---------- LOGIN ----------
+with tab1:
+    st.subheader("Login")
 
-# Fake data
-data = pd.DataFrame(
-    np.random.randn(n_points, 3),
-    columns=["A", "B", "C"]
-)
+    username = st.text_input("Username", key="login_user")
+    password = st.text_input("Password", type="password", key="login_pass")
 
-col1, col2 = st.columns(2)
-with col1:
-    st.subheader("Line chart")
-    st.line_chart(data)
-with col2:
-    st.subheader("Bar chart")
-    st.bar_chart(data)
+    if st.button("Login"):
+        success, msg = login_user(username, password)
+        if success:
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.success(msg)
+            st.switch_page("pages/mini_dashboard.py")
+        else:
+            st.error(msg)
 
-with st.expander("See raw data"):
-    st.dataframe(data)
+# ---------- REGISTER ----------
+with tab2:
+    st.subheader("Register")
 
-# Logout button (sidebar keeps UI consistent)
-st.markdown("---")
-if st.sidebar.button("Log out"):
-    st.session_state["logged_in"] = False
-    st.session_state["username"] = ""
-    st.info("You have been logged out.")
-    try:
-        st.switch_page("Home")
-    except Exception:
-        st.experimental_rerun()
+    new_user = st.text_input("Username", key="reg_user")
+    new_pass = st.text_input("Password", type="password", key="reg_pass")
+
+    if st.button("Register"):
+        success, msg = register_user(new_user, new_pass)
+        if success:
+            st.success(msg)
+        else:
+            st.error(msg)
