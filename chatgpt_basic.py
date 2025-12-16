@@ -1,6 +1,7 @@
 from openai import OpenAI
+import streamlit as st
 # Initialize the OpenAI client with your API key
-client = OpenAI(api_key='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')
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # Make a simple API call
 completion = client.chat.completions.create(
 model="gpt-4o",
