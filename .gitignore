@@ -1,5 +1,5 @@
 # Streamlit secrets (NEVER commit this!)
-.streamlit/secrets.toml
+.streamlit/mysecrets.toml
 # Environment variables
 .env
 # Python cache
