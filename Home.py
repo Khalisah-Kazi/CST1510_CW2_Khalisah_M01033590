@@ -29,7 +29,7 @@ with tab_login:
             st.session_state.logged_in = True
             st.session_state.username = username
             st.success(msg)
-            st.switch_page("pages/1_dashboard.py")
+            st.switch_page("1_dashboard.py")
         else:
             st.error(msg)
 
