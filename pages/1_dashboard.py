@@ -32,5 +32,5 @@ else:
 st.divider()
 if st.button("Logout"):
     st.session_state.clear()
-    st.switch_page("Home.py")
+    st.switch_page("Home")
 

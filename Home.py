@@ -13,7 +13,7 @@ st.title("🔐 Login / Register")
 if st.session_state.logged_in:
     st.success(f"Logged in as {st.session_state.username}")
     if st.button("Go to dashboard"):
-        st.switch_page("1_dashboard.py")
+        st.switch_page("pages/1_dashboard.py")
     st.stop()
 
 tab_login, tab_register = st.tabs(["Login", "Register"])
@@ -29,7 +29,7 @@ with tab_login:
             st.session_state.logged_in = True
             st.session_state.username = username
             st.success(msg)
-            st.switch_page("1_dashboard.py")
+            st.switch_page("pages/1_dashboard.py")
         else:
             st.error(msg)
 
